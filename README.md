@@ -1,6 +1,4 @@
-# Project Description
-
-WGPU Sample Project
+# WGPU Sample Project
 
 A project for learning rust wgpu, with UI using [egui](https://github.com/emilk/egui). The code is mainly based on [webgpu-samples](https://github.com/webgpu/webgpu-samples).
 
