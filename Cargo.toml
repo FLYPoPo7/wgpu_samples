@@ -1,0 +1,14 @@
+[package]
+name = "wgpu_samples"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+default = ["wgpu"]
+wgpu = ["eframe/wgpu", "dep:wgpu"]
+
+[dependencies]
+bytemuck = "1.15.0"
+eframe = { version = "0.27.2", features = ["wgpu"] }
+wgpu = { features = ["webgpu", "webgl"], optional = true}
+env_logger = "0.11.3"
