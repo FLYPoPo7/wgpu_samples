@@ -1,6 +1,6 @@
 use eframe::egui;
 
-use crate::custom3d;
+use crate::hello_triangle;
 
 /// The type of app to run.
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -36,8 +36,10 @@ const APPS: [(
         AppType::BasicGraphics,
         |frame: &eframe::Frame| {
             Some(Box::new(
-                custom3d::Custom3d::new_with_render_state(&frame.wgpu_render_state().unwrap())
-                    .unwrap(),
+                hello_triangle::HelloTriangle::new_with_render_state(
+                    &frame.wgpu_render_state().unwrap(),
+                )
+                .unwrap(),
             ))
         },
     ),
