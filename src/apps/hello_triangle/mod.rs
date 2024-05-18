@@ -3,6 +3,8 @@ use eframe::{
     egui_wgpu::{self, RenderState},
 };
 
+const CANVAS_SIZE: f32 = 600.0;
+
 pub struct HelloTriangle();
 
 impl HelloTriangle {
@@ -79,7 +81,7 @@ impl eframe::App for HelloTriangle {
 impl HelloTriangle {
     fn custom_painting(&self, ui: &mut egui::Ui) {
         let (rect, _response) =
-            ui.allocate_exact_size(egui::Vec2::splat(300.0), egui::Sense::click());
+            ui.allocate_exact_size(egui::Vec2::splat(CANVAS_SIZE), egui::Sense::click());
         ui.painter().add(egui_wgpu::Callback::new_paint_callback(
             rect,
             HelloTriangleCallback(),

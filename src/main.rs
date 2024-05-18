@@ -1,7 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-mod custom3d;
-mod hello_triangle;
+mod apps;
 mod main_app;
 
 use eframe::egui;

@@ -1,6 +1,6 @@
 use eframe::egui;
 
-use crate::hello_triangle;
+use crate::apps::hello_triangle;
 
 /// The type of app to run.
 #[derive(Clone, Copy, PartialEq, Eq)]
