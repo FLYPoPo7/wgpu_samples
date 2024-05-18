@@ -1,6 +1,6 @@
 use eframe::egui;
 
-use crate::apps::hello_triangle;
+use crate::apps::{hello_triangle, rotating_cube};
 
 /// The type of app to run.
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -51,7 +51,14 @@ const APPS: [(
     (
         "rotatingCube",
         AppType::BasicGraphics,
-        |_frame: &eframe::Frame| None,
+        |frame: &eframe::Frame| {
+            Some(Box::new(
+                rotating_cube::RotatingCube::new_with_render_state(
+                    &frame.wgpu_render_state().unwrap(),
+                )
+                .unwrap(),
+            ))
+        },
     ),
     (
         "twoCubes",

@@ -12,3 +12,4 @@ bytemuck = "1.15.0"
 eframe = { version = "0.27.2", features = ["wgpu"] }
 wgpu = { features = ["webgpu", "webgl"], optional = true}
 env_logger = "0.11.3"
+glam = { version = "0.27.0", features = ["bytemuck"] }

@@ -2,6 +2,7 @@
 
 mod apps;
 mod main_app;
+mod meshes;
 
 use eframe::egui;
 use main_app::MainApp;
