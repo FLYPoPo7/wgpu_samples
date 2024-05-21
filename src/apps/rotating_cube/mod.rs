@@ -168,6 +168,8 @@ impl eframe::App for RotatingCube {
                 });
             });
         });
+        // This is needed to animate the rotating cube. It tells eframe to call update() again on the next event loop iteration.
+        ctx.request_repaint();
     }
 }
 
