@@ -1,6 +1,6 @@
 use eframe::egui;
 
-use crate::apps::{hello_triangle, rotating_cube};
+use crate::apps::{hello_triangle, rotating_cube, two_cubes};
 
 /// The type of app to run.
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -44,7 +44,7 @@ const APPS: [(
         },
     ),
     (
-        "helloTriangleMSAA",
+        "helloTriangleMSAA(WIP)",
         AppType::BasicGraphics,
         |_frame: &eframe::Frame| None,
     ),
@@ -63,124 +63,129 @@ const APPS: [(
     (
         "twoCubes",
         AppType::BasicGraphics,
-        |_frame: &eframe::Frame| None,
+        |frame: &eframe::Frame| {
+            Some(Box::new(
+                two_cubes::TwoCubes::new_with_render_state(&frame.wgpu_render_state().unwrap())
+                    .unwrap(),
+            ))
+        },
     ),
     (
-        "texturedCube",
+        "texturedCube(WIP)",
         AppType::BasicGraphics,
         |_frame: &eframe::Frame| None,
     ),
     (
-        "instancedCube",
+        "instancedCube(WIP)",
         AppType::BasicGraphics,
         |_frame: &eframe::Frame| None,
     ),
     (
-        "fractalCube",
+        "fractalCube(WIP)",
         AppType::BasicGraphics,
         |_frame: &eframe::Frame| None,
     ),
     (
-        "cubemap",
+        "cubemap(WIP)",
         AppType::BasicGraphics,
         |_frame: &eframe::Frame| None,
     ),
     // WebGPU Features
     (
-        "samplerParameters",
+        "samplerParameters(WIP)",
         AppType::WebGPUFeatures,
         |_frame: &eframe::Frame| None,
     ),
     (
-        "reversedZ",
+        "reversedZ(WIP)",
         AppType::WebGPUFeatures,
         |_frame: &eframe::Frame| None,
     ),
     (
-        "renderBundles",
+        "renderBundles(WIP)",
         AppType::WebGPUFeatures,
         |_frame: &eframe::Frame| None,
     ),
     // GPGPU Demos
     (
-        "computeBoids",
+        "computeBoids(WIP)",
         AppType::GPGPUDemos,
         |_frame: &eframe::Frame| None,
     ),
     (
-        "gameOfLife",
+        "gameOfLife(WIP)",
         AppType::GPGPUDemos,
         |_frame: &eframe::Frame| None,
     ),
     (
-        "bitonicSort",
+        "bitonicSort(WIP)",
         AppType::GPGPUDemos,
         |_frame: &eframe::Frame| None,
     ),
     // Graphics Techniques
     (
-        "cameras",
+        "cameras(WIP)",
         AppType::GraphicsTechniques,
         |_frame: &eframe::Frame| None,
     ),
     (
-        "normalMap",
+        "normalMap(WIP)",
         AppType::GraphicsTechniques,
         |_frame: &eframe::Frame| None,
     ),
     (
-        "shadowMapping",
+        "shadowMapping(WIP)",
         AppType::GraphicsTechniques,
         |_frame: &eframe::Frame| None,
     ),
     (
-        "deferredRendering",
+        "deferredRendering(WIP)",
         AppType::GraphicsTechniques,
         |_frame: &eframe::Frame| None,
     ),
     (
-        "particles",
+        "particles(WIP)",
         AppType::GraphicsTechniques,
         |_frame: &eframe::Frame| None,
     ),
     (
-        "points",
+        "points(WIP)",
         AppType::GraphicsTechniques,
         |_frame: &eframe::Frame| None,
     ),
     (
-        "imageBlur",
+        "imageBlur(WIP)",
         AppType::GraphicsTechniques,
         |_frame: &eframe::Frame| None,
     ),
     (
-        "cornell",
+        "cornell(WIP)",
         AppType::GraphicsTechniques,
         |_frame: &eframe::Frame| None,
     ),
     (
-        "a-buffer",
+        "a-buffer(WIP)",
         AppType::GraphicsTechniques,
         |_frame: &eframe::Frame| None,
     ),
     (
-        "skinnedMesh",
+        "skinnedMesh(WIP)",
         AppType::GraphicsTechniques,
         |_frame: &eframe::Frame| None,
     ),
     (
-        "textRenderingMsdf",
+        "textRenderingMsdf(WIP)",
         AppType::GraphicsTechniques,
         |_frame: &eframe::Frame| None,
     ),
     (
-        "volumeRenderingTexture3D",
+        "volumeRenderingTexture3D(WIP)",
         AppType::GraphicsTechniques,
         |_frame: &eframe::Frame| None,
     ),
     // Benchmarks
     (
-        "animometer",
+        "animometer(WIP)",
         AppType::Benchmarks,
         |_frame: &eframe::Frame| None,
     ),
