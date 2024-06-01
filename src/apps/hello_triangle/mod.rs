@@ -60,7 +60,7 @@ impl HelloTriangle {
             .renderer
             .write()
             .callback_resources
-            .insert(HelloTriangleRenderResources { pipeline });
+            .insert(AppRenderResources { pipeline });
 
         Some(Self())
     }
@@ -84,14 +84,14 @@ impl HelloTriangle {
             ui.allocate_exact_size(egui::Vec2::splat(CANVAS_SIZE), egui::Sense::click());
         ui.painter().add(egui_wgpu::Callback::new_paint_callback(
             rect,
-            HelloTriangleCallback(),
+            CustomPaintCallback(),
         ));
     }
 }
 
-struct HelloTriangleCallback();
+struct CustomPaintCallback();
 
-impl egui_wgpu::CallbackTrait for HelloTriangleCallback {
+impl egui_wgpu::CallbackTrait for CustomPaintCallback {
     fn prepare(
         &self,
         _device: &wgpu::Device,
@@ -109,12 +109,12 @@ impl egui_wgpu::CallbackTrait for HelloTriangleCallback {
         render_pass: &mut wgpu::RenderPass<'a>,
         callback_resources: &'a egui_wgpu::CallbackResources,
     ) {
-        let resources: &HelloTriangleRenderResources = callback_resources.get().unwrap();
+        let resources: &AppRenderResources = callback_resources.get().unwrap();
         render_pass.set_pipeline(&resources.pipeline);
         render_pass.draw(0..3, 0..1);
     }
 }
 
-struct HelloTriangleRenderResources {
+struct AppRenderResources {
     pub pipeline: wgpu::RenderPipeline,
 }

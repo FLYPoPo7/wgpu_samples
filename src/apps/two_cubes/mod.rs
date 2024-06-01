@@ -177,7 +177,7 @@ impl TwoCubes {
             .renderer
             .write()
             .callback_resources
-            .insert(HelloTriangleRenderResources {
+            .insert(AppRenderResources {
                 start_time: std::time::Instant::now(),
                 pipeline,
                 vertices_buffer,
@@ -210,14 +210,14 @@ impl TwoCubes {
             ui.allocate_exact_size(egui::Vec2::new(CANVAS.0, CANVAS.1), egui::Sense::click());
         ui.painter().add(egui_wgpu::Callback::new_paint_callback(
             rect,
-            HelloTriangleCallback(),
+            CustomPaintCallback(),
         ));
     }
 }
 
-struct HelloTriangleCallback();
+struct CustomPaintCallback();
 
-impl egui_wgpu::CallbackTrait for HelloTriangleCallback {
+impl egui_wgpu::CallbackTrait for CustomPaintCallback {
     fn prepare(
         &self,
         _device: &wgpu::Device,
@@ -226,7 +226,7 @@ impl egui_wgpu::CallbackTrait for HelloTriangleCallback {
         _egui_encoder: &mut wgpu::CommandEncoder,
         callback_resources: &mut egui_wgpu::CallbackResources,
     ) -> Vec<wgpu::CommandBuffer> {
-        let resources: &HelloTriangleRenderResources = callback_resources.get().unwrap();
+        let resources: &AppRenderResources = callback_resources.get().unwrap();
         queue.write_buffer(
             &resources.mvp_buffer,
             0,
@@ -246,7 +246,7 @@ impl egui_wgpu::CallbackTrait for HelloTriangleCallback {
         render_pass: &mut wgpu::RenderPass<'a>,
         callback_resources: &'a egui_wgpu::CallbackResources,
     ) {
-        let resources: &HelloTriangleRenderResources = callback_resources.get().unwrap();
+        let resources: &AppRenderResources = callback_resources.get().unwrap();
         render_pass.set_pipeline(&resources.pipeline);
         render_pass.set_vertex_buffer(0, resources.vertices_buffer.slice(..));
         render_pass.set_bind_group(0, &resources.mvp_bind_group_0, &[]);
@@ -256,7 +256,7 @@ impl egui_wgpu::CallbackTrait for HelloTriangleCallback {
     }
 }
 
-struct HelloTriangleRenderResources {
+struct AppRenderResources {
     pub start_time: std::time::Instant,
     pub pipeline: wgpu::RenderPipeline,
     pub vertices_buffer: wgpu::Buffer,
