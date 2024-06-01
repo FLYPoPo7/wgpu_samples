@@ -34,34 +34,37 @@ impl TexturedCube {
         let device = &wgpu_render_state.device;
         let queue = &wgpu_render_state.queue;
 
-        let vertices_buffer_layout = wgpu::VertexBufferLayout {
-            array_stride: 10 * std::mem::size_of::<f32>() as wgpu::BufferAddress,
-            step_mode: wgpu::VertexStepMode::Vertex,
-            attributes: &[
-                wgpu::VertexAttribute {
-                    format: wgpu::VertexFormat::Float32x4,
-                    offset: 0,
-                    shader_location: 0,
-                },
-                wgpu::VertexAttribute {
-                    format: wgpu::VertexFormat::Float32x4,
-                    offset: 4 * std::mem::size_of::<f32>() as u64,
-                    shader_location: 1,
-                },
-                wgpu::VertexAttribute {
-                    format: wgpu::VertexFormat::Float32x2,
-                    offset: 8 * std::mem::size_of::<f32>() as u64,
-                    shader_location: 2,
-                },
-            ],
-        };
+        let (vertex_buffer, vertex_buffer_layout) = {
+            let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("TexturedCube Vertex Buffer"),
+                contents: bytemuck::cast_slice(cube::VERTICES),
+                usage: wgpu::BufferUsages::VERTEX,
+            });
 
-        let vertices_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("TexturedCube Vertex Buffer"),
-            #[rustfmt::skip]
-            contents: bytemuck::cast_slice(cube::VERTICES),
-            usage: wgpu::BufferUsages::VERTEX,
-        });
+            let vertex_buffer_layout = wgpu::VertexBufferLayout {
+                array_stride: 10 * std::mem::size_of::<f32>() as wgpu::BufferAddress,
+                step_mode: wgpu::VertexStepMode::Vertex,
+                attributes: &[
+                    wgpu::VertexAttribute {
+                        format: wgpu::VertexFormat::Float32x4,
+                        offset: 0,
+                        shader_location: 0,
+                    },
+                    wgpu::VertexAttribute {
+                        format: wgpu::VertexFormat::Float32x4,
+                        offset: 4 * std::mem::size_of::<f32>() as u64,
+                        shader_location: 1,
+                    },
+                    wgpu::VertexAttribute {
+                        format: wgpu::VertexFormat::Float32x2,
+                        offset: 8 * std::mem::size_of::<f32>() as u64,
+                        shader_location: 2,
+                    },
+                ],
+            };
+
+            (vertex_buffer, vertex_buffer_layout)
+        };
 
         // Create the mvp buffer and bind group
         let (mvp_buffer, mvp_bind_group_layout, mvp_bind_group) = {
@@ -208,7 +211,7 @@ impl TexturedCube {
             vertex: wgpu::VertexState {
                 module: &shader,
                 entry_point: "vs_main",
-                buffers: &[vertices_buffer_layout],
+                buffers: &[vertex_buffer_layout],
             },
             fragment: Some(wgpu::FragmentState {
                 module: &shader,
@@ -250,7 +253,7 @@ impl TexturedCube {
             .insert(HelloTriangleRenderResources {
                 start_time: std::time::Instant::now(),
                 pipeline,
-                vertices_buffer,
+                vertex_buffer,
                 mvp_buffer,
                 mvp_bind_group,
                 diffuse_texture,
@@ -314,9 +317,9 @@ impl egui_wgpu::CallbackTrait for HelloTriangleCallback {
     ) {
         let resources: &HelloTriangleRenderResources = callback_resources.get().unwrap();
         render_pass.set_pipeline(&resources.pipeline);
+        render_pass.set_vertex_buffer(0, resources.vertex_buffer.slice(..));
         render_pass.set_bind_group(0, &resources.mvp_bind_group, &[]);
         render_pass.set_bind_group(1, &resources.diffuse_bind_group, &[]);
-        render_pass.set_vertex_buffer(0, resources.vertices_buffer.slice(..));
         render_pass.draw(0..cube::VERTEX_COUNT, 0..1);
     }
 }
@@ -324,7 +327,7 @@ impl egui_wgpu::CallbackTrait for HelloTriangleCallback {
 struct HelloTriangleRenderResources {
     pub start_time: std::time::Instant,
     pub pipeline: wgpu::RenderPipeline,
-    pub vertices_buffer: wgpu::Buffer,
+    pub vertex_buffer: wgpu::Buffer,
     pub mvp_buffer: wgpu::Buffer,
     pub mvp_bind_group: wgpu::BindGroup,
     #[allow(dead_code)]
