@@ -33,63 +33,74 @@ impl RotatingCube {
     pub fn new_with_render_state(wgpu_render_state: &RenderState) -> Option<Self> {
         let device = &wgpu_render_state.device;
 
-        let vertices_buffer_layout = wgpu::VertexBufferLayout {
-            array_stride: 10 * std::mem::size_of::<f32>() as wgpu::BufferAddress,
-            step_mode: wgpu::VertexStepMode::Vertex,
-            attributes: &[
-                wgpu::VertexAttribute {
-                    format: wgpu::VertexFormat::Float32x4,
-                    offset: 0,
-                    shader_location: 0,
-                },
-                wgpu::VertexAttribute {
-                    format: wgpu::VertexFormat::Float32x4,
-                    offset: 4 * std::mem::size_of::<f32>() as u64,
-                    shader_location: 1,
-                },
-                wgpu::VertexAttribute {
-                    format: wgpu::VertexFormat::Float32x2,
-                    offset: 8 * std::mem::size_of::<f32>() as u64,
-                    shader_location: 2,
-                },
-            ],
+        // Create the vertex buffer and layout
+        let (vertex_buffer, vertex_buffer_layout) = {
+            let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("RotatingCube Vertex Buffer"),
+                #[rustfmt::skip]
+            contents: bytemuck::cast_slice(cube::VERTICES),
+                usage: wgpu::BufferUsages::VERTEX,
+            });
+
+            let vertex_buffer_layout = wgpu::VertexBufferLayout {
+                array_stride: 10 * std::mem::size_of::<f32>() as wgpu::BufferAddress,
+                step_mode: wgpu::VertexStepMode::Vertex,
+                attributes: &[
+                    wgpu::VertexAttribute {
+                        format: wgpu::VertexFormat::Float32x4,
+                        offset: 0,
+                        shader_location: 0,
+                    },
+                    wgpu::VertexAttribute {
+                        format: wgpu::VertexFormat::Float32x4,
+                        offset: 4 * std::mem::size_of::<f32>() as u64,
+                        shader_location: 1,
+                    },
+                    wgpu::VertexAttribute {
+                        format: wgpu::VertexFormat::Float32x2,
+                        offset: 8 * std::mem::size_of::<f32>() as u64,
+                        shader_location: 2,
+                    },
+                ],
+            };
+
+            (vertex_buffer, vertex_buffer_layout)
         };
 
-        let vertices_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("RotatingCube Vertex Buffer"),
-            #[rustfmt::skip]
-            contents: bytemuck::cast_slice(cube::VERTICES),
-            usage: wgpu::BufferUsages::VERTEX,
-        });
+        // Create the mvp buffer and bind group
+        let (mvp_buffer, mvp_bind_group_layout, mvp_bind_group) = {
+            let buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("MVP Buffer"),
+                contents: bytemuck::cast_slice(&[0.0f32; 16 * 4]),
+                usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+            });
 
-        let mvp_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("MVP Buffer"),
-            contents: bytemuck::cast_slice(&[0.0f32; 16 * 4]),
-            usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
-        });
+            let bind_group_layout =
+                device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+                    label: Some("MVP Bind Group Layout"),
+                    entries: &[wgpu::BindGroupLayoutEntry {
+                        binding: 0,
+                        visibility: wgpu::ShaderStages::VERTEX,
+                        ty: wgpu::BindingType::Buffer {
+                            ty: wgpu::BufferBindingType::Uniform,
+                            has_dynamic_offset: false,
+                            min_binding_size: None,
+                        },
+                        count: None,
+                    }],
+                });
 
-        let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-            label: Some("Bind Group Layout"),
-            entries: &[wgpu::BindGroupLayoutEntry {
-                binding: 0,
-                visibility: wgpu::ShaderStages::VERTEX,
-                ty: wgpu::BindingType::Buffer {
-                    ty: wgpu::BufferBindingType::Uniform,
-                    has_dynamic_offset: false,
-                    min_binding_size: None,
-                },
-                count: None,
-            }],
-        });
+            let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+                label: Some("MVP Bind Group"),
+                layout: &bind_group_layout,
+                entries: &[wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: buffer.as_entire_binding(),
+                }],
+            });
 
-        let mvp_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
-            label: Some("MVP Bind Group"),
-            layout: &bind_group_layout,
-            entries: &[wgpu::BindGroupEntry {
-                binding: 0,
-                resource: mvp_buffer.as_entire_binding(),
-            }],
-        });
+            (buffer, bind_group_layout, bind_group)
+        };
 
         let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("RotatingCube Shader Module"),
@@ -98,7 +109,7 @@ impl RotatingCube {
 
         let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: Some("RotatingCube Pipeline Layout"),
-            bind_group_layouts: &[&bind_group_layout],
+            bind_group_layouts: &[&mvp_bind_group_layout],
             push_constant_ranges: &[],
         });
 
@@ -108,7 +119,7 @@ impl RotatingCube {
             vertex: wgpu::VertexState {
                 module: &shader,
                 entry_point: "vs_main",
-                buffers: &[vertices_buffer_layout],
+                buffers: &[vertex_buffer_layout],
             },
             fragment: Some(wgpu::FragmentState {
                 module: &shader,
@@ -150,7 +161,7 @@ impl RotatingCube {
             .insert(HelloTriangleRenderResources {
                 start_time: std::time::Instant::now(),
                 pipeline,
-                vertices_buffer,
+                vertex_buffer,
                 mvp_buffer,
                 mvp_bind_group,
             });
@@ -213,7 +224,7 @@ impl egui_wgpu::CallbackTrait for HelloTriangleCallback {
         let resources: &HelloTriangleRenderResources = callback_resources.get().unwrap();
         render_pass.set_pipeline(&resources.pipeline);
         render_pass.set_bind_group(0, &resources.mvp_bind_group, &[]);
-        render_pass.set_vertex_buffer(0, resources.vertices_buffer.slice(..));
+        render_pass.set_vertex_buffer(0, resources.vertex_buffer.slice(..));
         render_pass.draw(0..cube::VERTEX_COUNT, 0..1);
     }
 }
@@ -221,7 +232,7 @@ impl egui_wgpu::CallbackTrait for HelloTriangleCallback {
 struct HelloTriangleRenderResources {
     pub start_time: std::time::Instant,
     pub pipeline: wgpu::RenderPipeline,
-    pub vertices_buffer: wgpu::Buffer,
+    pub vertex_buffer: wgpu::Buffer,
     pub mvp_buffer: wgpu::Buffer,
     pub mvp_bind_group: wgpu::BindGroup,
 }
