@@ -34,6 +34,7 @@ impl TexturedCube {
         let device = &wgpu_render_state.device;
         let queue = &wgpu_render_state.queue;
 
+        // Create the vertex buffer and layout
         let (vertex_buffer, vertex_buffer_layout) = {
             let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
                 label: Some("TexturedCube Vertex Buffer"),
