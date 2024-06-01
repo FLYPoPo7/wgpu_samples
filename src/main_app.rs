@@ -1,6 +1,6 @@
 use eframe::egui;
 
-use crate::apps::{hello_triangle, rotating_cube, two_cubes};
+use crate::apps::{hello_triangle, rotating_cube, textured_cube, two_cubes};
 
 /// The type of app to run.
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -71,9 +71,16 @@ const APPS: [(
         },
     ),
     (
-        "texturedCube(WIP)",
+        "texturedCube",
         AppType::BasicGraphics,
-        |_frame: &eframe::Frame| None,
+        |frame: &eframe::Frame| {
+            Some(Box::new(
+                textured_cube::TexturedCube::new_with_render_state(
+                    &frame.wgpu_render_state().unwrap(),
+                )
+                .unwrap(),
+            ))
+        },
     ),
     (
         "instancedCube(WIP)",

@@ -16,7 +16,7 @@ fn main() -> Result<(), eframe::Error> {
         ..Default::default()
     };
     eframe::run_native(
-        "My egui App",
+        "wgpu samples",
         options,
         Box::new(|cc: &eframe::CreationContext| Box::new(MainApp::new(cc).unwrap())),
     )
