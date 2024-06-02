@@ -1,6 +1,8 @@
 use eframe::egui;
 
-use crate::apps::{hello_triangle, instanced_cube, rotating_cube, textured_cube, two_cubes};
+use crate::apps::{
+    cubemap, hello_triangle, instanced_cube, rotating_cube, textured_cube, two_cubes,
+};
 
 /// The type of app to run.
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -100,9 +102,14 @@ const APPS: [(
         |_frame: &eframe::Frame| None,
     ),
     (
-        "cubemap(WIP)",
+        "cubemap",
         AppType::BasicGraphics,
-        |_frame: &eframe::Frame| None,
+        |frame: &eframe::Frame| {
+            Some(Box::new(
+                cubemap::Cubemap::new_with_render_state(&frame.wgpu_render_state().unwrap())
+                    .unwrap(),
+            ))
+        },
     ),
     // WebGPU Features
     (

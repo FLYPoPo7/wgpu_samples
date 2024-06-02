@@ -1,3 +1,4 @@
+pub mod cubemap;
 pub mod custom3d;
 pub mod hello_triangle;
 pub mod instanced_cube;
